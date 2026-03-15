@@ -75,6 +75,24 @@ public class CustomerCardService {
     }
 
     @Transactional
+    public boolean delete(String custCode) {
+        log.info("DELETE customer card: custCode={}", custCode);
+        if (!cardRepo.existsById(custCode)) {
+            log.warn("Customer card not found for delete: custCode={}", custCode);
+            return false;
+        }
+        planRepo.findByCustomerCardCustCode(custCode).forEach(p -> planYearRepo.deleteByPlanId(p.getId()));
+        planRepo.deleteByCustomerCardCustCode(custCode);
+        thirdPartyRepo.deleteByCustomerCardCustCode(custCode);
+        optionRepo.deleteByCustomerCardCustCode(custCode);
+        rePreferenceRepo.deleteByCustomerCardCustCode(custCode);
+        entityManager.flush();
+        cardRepo.deleteById(custCode);
+        log.info("Customer card deleted: custCode={}", custCode);
+        return true;
+    }
+
+    @Transactional
     public Optional<CustomerCardDto> update(String custCode, CustomerCardDto dto) {
         log.info("PUT customer card: custCode={}", custCode);
         return cardRepo.findById(custCode).map(card -> {

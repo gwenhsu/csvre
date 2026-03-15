@@ -42,4 +42,11 @@ public class CustomerCardController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{custCode}")
+    public ResponseEntity<Void> delete(@PathVariable String custCode) {
+        return service.delete(custCode)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
 }

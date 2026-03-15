@@ -138,6 +138,28 @@ class CustomerCardControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin")
+    void delete_found_returnsNoContent() throws Exception {
+        when(service.delete("C001")).thenReturn(true);
+
+        mockMvc.perform(delete("/api/customer-card/C001")
+                        .header("login-user", "user01")
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(username = "admin")
+    void delete_notFound_returns404() throws Exception {
+        when(service.delete("UNKNOWN")).thenReturn(false);
+
+        mockMvc.perform(delete("/api/customer-card/UNKNOWN")
+                        .header("login-user", "user01")
+                        .with(csrf()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getAll_withoutAuth_returns401() throws Exception {
         mockMvc.perform(get("/api/customer-card")
                         .header("login-user", "user01"))
